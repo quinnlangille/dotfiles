@@ -1,6 +1,28 @@
 " GENERAL WHATEVER
 syntax on
 
+set number
+set linebreak
+set textwidth=100
+set showmatch
+set visualbell
+
+set hlsearch
+set smartcase
+set ignorecase
+set incsearch
+
+set autoindent
+set shiftwidth=4
+set smartindent
+set smarttab
+set softtabstop=4
+
+" ADVANCED
+set ruler
+set undolevels=1000
+set backspace=indent,eol,start
+
 " NERDTree config
 map <silent> <C-n> :NERDTreeFocus<CR>
 
