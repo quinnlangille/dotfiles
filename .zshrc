@@ -20,6 +20,15 @@ plugins=(
   syntax-highlighting
 )
 
+# Docker-Trash stops, deletes and removes images of all files matching the pattern     passed in the first argument
+docker-trash() {
+  container="$1"
+  echo $container
+  docker stop $(docker ps -a | grep $container | awk '{ print $1 }');
+  docker rm $(docker ps -a | grep $container  | awk '{ print $1 }');
+  docker rmi $(docker images -a | grep $container | awk '{ print $3 }');
+}
+
 # vim lightline support
 export TERM=xterm-256color
 
