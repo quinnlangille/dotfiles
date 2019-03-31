@@ -9,18 +9,33 @@ endif
 " Start installing plugins
 call plug#begin('~/.vim/plugged')
 
+" Typescript Stuff
+Plug 'Quramy/tsuquyomi'
+Plug 'leafgarland/typescript-vim'
+
+" Linting / Completion
+Plug 'Valloric/YouCompleteMe'
+Plug 'w0rp/ale'
+
+" Layout / Looks
 Plug 'itchyny/lightline.vim'
 Plug 'scrooloose/nerdtree'
-Plug 'leafgarland/typescript-vim'
 Plug 'dracula/vim', { 'as': 'dracula' }
 
 " Initialize plugin system
 call plug#end()
 
+" Configure YCM
+let g:ycm_global_ycm_extra_conf = '~/.ycm_extra_conf.py'
+
+" Configure Linter
+let g:ale_fix_on_save = 1
+
 " GENERAL WHATEVER
 syntax on
 color dracula
 
+set clipboard=unnamed
 set number
 set linebreak
 set showmatch
