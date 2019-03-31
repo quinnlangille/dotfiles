@@ -36,6 +36,7 @@ syntax on
 color dracula
 
 set clipboard=unnamed
+set mouse+=a
 set number
 set linebreak
 set showmatch
