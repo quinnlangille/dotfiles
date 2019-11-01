@@ -51,8 +51,7 @@ alias lt='ls --tree'
 alias cat='bat'
 
 # config autosuggest
-export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#ff00ff,bg=cyan,bold,underline"
-export ZSH_AUTOSUGGEST_STRATEGY=(match_prev_cmd, completion)
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=195'
 bindkey '^ ' autosuggest-accept
 
 ###############
