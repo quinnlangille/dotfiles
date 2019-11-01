@@ -41,6 +41,10 @@ alias la='ls -a'
 alias lla='ls -la'
 alias lt='ls --tree'
 
+# cat upgrade
+# brew install bat
+alias cat='bat'
+
 ###############
 ## FUNCTIONS ##
 ###############
