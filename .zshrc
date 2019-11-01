@@ -6,7 +6,11 @@
 export ZSH=$HOME/.oh-my-zsh
 # vim lightline support
 export TERM=xterm-256color
+# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
+export PATH="$PATH:$HOME/.rvm/bin"
+export PATH="/usr/local/opt/terraform@0.11/bin:$PATH"
 
+# git clone https://github.com/zsh-users/zsh-autosuggestions ~/.zsh/zsh-autosuggestions
 ## PLUGINS ##
 plugins=(
   zsh-nvm
@@ -14,6 +18,7 @@ plugins=(
   wd
   git
   syntax-highlighting
+  zsh-autosuggestions
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -44,6 +49,11 @@ alias lt='ls --tree'
 # cat upgrade
 # brew install bat
 alias cat='bat'
+
+# config autosuggest
+export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#ff00ff,bg=cyan,bold,underline"
+export ZSH_AUTOSUGGEST_STRATEGY=(match_prev_cmd, completion)
+bindkey '^ ' autosuggest-accept
 
 ###############
 ## FUNCTIONS ##
