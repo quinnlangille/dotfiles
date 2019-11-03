@@ -69,12 +69,16 @@ fi
 
 # Set up YouCompleteMe
 if command -v cmake &>/dev/null; then
-    echo "Cmake alreadt installed at $(which cmake)";
+    echo "Cmake already installed at $(which cmake)";
 else 
     brew install cmake;
 fi
 
 # Compile YCM
 . ~/.vim/bundle/YouCompleteMe/install.py --ts-completer ----rust-completer 
+
+if ($1 === "--rust"); then
+    sh -c "./rust-setup.sh";
+fi
 
 echo "👏 Setup all done!"
