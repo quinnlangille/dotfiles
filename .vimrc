@@ -25,7 +25,7 @@ Plug 'jiangmiao/auto-pairs'
 " Layout / Look
 Plug 'itchyny/lightline.vim'
 Plug 'scrooloose/nerdtree'
-Plug 'dracula/vim', { 'as': 'dracula' }
+Plug 'arcticicestudio/nord-vim'
 
 " Autoreload
 Plug 'tmux-plugins/vim-tmux-focus-events'
@@ -67,7 +67,7 @@ autocmd FileChangedShellPost *
 
 " GENERAL WHATEVER
 syntax on
-color dracula
+color nord
 
 set autoread
 set clipboard=unnamed
