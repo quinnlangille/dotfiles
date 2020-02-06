@@ -10,6 +10,10 @@ else
   echo "cargo installed at $(cargo --version)";
 fi
 
+# Source cargo setup and restart shell
+source $HOME/.cargo/env
+zsh
+
 # racer for syntax
 # rustfmt for formatting
 # rustsym for symbol support
@@ -17,4 +21,3 @@ fi
 cargo install racer rustfmt rustsym cargo-watch
 
 echo "👏 Rust setup complete!"
-
