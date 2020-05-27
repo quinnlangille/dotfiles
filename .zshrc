@@ -57,11 +57,29 @@ bindkey '^ ' autosuggest-accept
 ###############
 ## FUNCTIONS ##
 ###############
-# Docker-Trash stops, deletes and removes images of all files matching the pattern     passed in the first argument
+# Docker-Trash stops, deletes and removes images of all containers matching the pattern passed in the first argument
+# arguments
+# - container: name of container you want to trash
 docker-trash() {
   container="$1"
-  echo $container
+  echo "Trashing ${container}"
   docker stop $(docker ps -a | grep $container | awk '{ print $1 }');
   docker rm $(docker ps -a | grep $container  | awk '{ print $1 }');
   docker rmi $(docker images -a | grep $container | awk '{ print $3 }');
+}
+
+# docker-reset - use instead of 'docker-compose up'. This kills a container if it's running, starts it in the background
+# and follows the log file for it
+# arguments:
+# - container: name of container you want to stop
+# - logAmount: how far back to start tail, defaults to 0
+docker-reset() {
+  container="$1"
+  logAmount=$2 || "0";
+
+  echo "Reseting ${container} with tail ${logAmount}"
+
+  docker-compose kill $container &&
+  docker-compose up -d $container &&
+  docker-compose logs -f --tail=$logAmount $container;
 }
