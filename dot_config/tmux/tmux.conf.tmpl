@@ -1,0 +1,136 @@
+# tmux config - managed by chezmoi
+# vim: set ft=tmux:
+
+{{- /* Resolve machine config: check machines map, fall back to OS defaults */ -}}
+{{- $machine := index .machines .chezmoi.hostname -}}
+{{- if not $machine -}}
+  {{- $machine = index .defaults .chezmoi.os -}}
+{{- end -}}
+{{- $accent := $machine.accent -}}
+{{- $label := $machine.label -}}
+
+# =============================================================================
+# Machine: {{ .chezmoi.hostname }} | Accent: {{ $accent }}
+# =============================================================================
+
+# Prefix Key - Ctrl+a everywhere
+unbind C-b
+set -g prefix C-a
+bind C-a send-prefix
+
+# =============================================================================
+# Nested Session Handling (F12 to toggle)
+# =============================================================================
+# When in a nested tmux (SSH), press F12 to turn OFF this outer tmux.
+# All keys will pass through to the inner tmux. Press F12 again to re-enable.
+# Visual: status bar dims and shows "OFF" when passthrough is active.
+
+bind -T root F12 \
+  set prefix None \;\
+  set key-table off \;\
+  set status-style "bg=#181825,fg=#6c7086" \;\
+  set status-left "#[fg=#6c7086,bg=#313244,bold] #S #[fg=#313244,bg=#181825]" \;\
+  set status-right "#[fg=#313244]#[fg=#6c7086,bg=#313244] OFF #[fg=#45475a]#[fg=#6c7086,bg=#45475a,bold] {{ $label }} " \;\
+  set window-status-current-format "#[fg=#6c7086,bg=#313244] #I:#W " \;\
+  refresh-client -S
+
+bind -T off F12 \
+  set -u prefix \;\
+  set -u key-table \;\
+  set -u status-style \;\
+  set -u status-left \;\
+  set -u status-right \;\
+  set -u window-status-current-format \;\
+  refresh-client -S
+
+# =============================================================================
+# General Settings
+# =============================================================================
+set -g default-terminal "tmux-256color"
+set -ag terminal-overrides ",xterm-256color:RGB"
+set -g history-limit 50000
+set -g display-time 4000
+set -g status-interval 5
+set -g focus-events on
+set -g mouse on
+
+# Start windows and panes at 1, not 0
+set -g base-index 1
+setw -g pane-base-index 1
+set -g renumber-windows on
+
+# Faster key repetition
+set -s escape-time 0
+
+# =============================================================================
+# Key Bindings
+# =============================================================================
+# Reload config
+bind r source-file ~/.config/tmux/tmux.conf \; display "Config reloaded!"
+
+# Split panes with | and -
+bind | split-window -h -c "#{pane_current_path}"
+bind - split-window -v -c "#{pane_current_path}"
+unbind '"'
+unbind %
+
+# New window in current path
+bind c new-window -c "#{pane_current_path}"
+
+# Vim-style pane navigation
+bind h select-pane -L
+bind j select-pane -D
+bind k select-pane -U
+bind l select-pane -R
+
+# Resize panes with Vim keys
+bind -r H resize-pane -L 5
+bind -r J resize-pane -D 5
+bind -r K resize-pane -U 5
+bind -r L resize-pane -R 5
+
+# Quick window switching
+bind -r n next-window
+bind -r p previous-window
+
+# =============================================================================
+# Copy Mode (native-feeling)
+# =============================================================================
+setw -g mode-keys vi
+
+# Enter copy mode with prefix+[
+bind [ copy-mode
+
+# Vi-style selection
+bind -T copy-mode-vi v send -X begin-selection
+bind -T copy-mode-vi y send -X copy-selection-and-cancel
+
+{{- if eq .chezmoi.os "darwin" }}
+# macOS: copy to system clipboard
+bind -T copy-mode-vi y send -X copy-pipe-and-cancel "pbcopy"
+bind -T copy-mode-vi MouseDragEnd1Pane send -X copy-pipe-and-cancel "pbcopy"
+{{- else }}
+# Linux: copy to system clipboard (Wayland)
+bind -T copy-mode-vi y send -X copy-pipe-and-cancel "wl-copy"
+bind -T copy-mode-vi MouseDragEnd1Pane send -X copy-pipe-and-cancel "wl-copy"
+{{- end }}
+
+# =============================================================================
+# Status Bar - Catppuccin Mocha (accent: {{ $accent }})
+# =============================================================================
+set -g status-style "bg=#1e1e2e,fg=#cdd6f4"
+set -g status-left "#[fg=#1e1e2e,bg={{ $accent }},bold] #S #[fg={{ $accent }},bg=#1e1e2e]"
+set -g status-right "#[fg=#45475a]#[fg=#cdd6f4,bg=#45475a] %H:%M #[fg={{ $accent }}]#[fg=#1e1e2e,bg={{ $accent }},bold] {{ $label }} "
+set -g window-status-current-format "#[fg=#1e1e2e,bg={{ $accent }}] #I:#W "
+
+set -g status-left-length 30
+set -g status-right-length 50
+set -g window-status-format "#[fg=#6c7086] #I:#W "
+set -g window-status-separator ""
+
+# Pane borders
+set -g pane-border-style "fg=#45475a"
+set -g pane-active-border-style "fg={{ $accent }}"
+
+# Message style
+set -g message-style "bg=#1e1e2e,fg=#cdd6f4"

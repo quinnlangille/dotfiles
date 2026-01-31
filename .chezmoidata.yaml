@@ -1,0 +1,32 @@
+# Machine-specific configuration
+# Add new machines here as you migrate them to chezmoi
+#
+# Available Catppuccin Mocha accent colors:
+#   rosewater: "#f5e0dc"  flamingo: "#f2cdcd"  pink:    "#f5c2e7"
+#   mauve:     "#cba6f7"  red:      "#f38ba8"  maroon:  "#eba0ac"
+#   peach:     "#fab387"  yellow:   "#f9e2af"  green:   "#a6e3a1"
+#   teal:      "#94e2d5"  sky:      "#89dceb"  sapphire:"#74c7ec"
+#   blue:      "#89b4fa"  lavender: "#b4befe"
+
+machines:
+  big-rig-gaming:
+    accent: "#94e2d5"    # teal
+    label: "gaming"
+
+  # Add machines as you migrate them:
+  # macbook-pro:
+  #   accent: "#b4befe"  # lavender
+  #   label: "mbp"
+  #
+  # dev-server:
+  #   accent: "#fab387"  # peach
+  #   label: "dev"
+
+# Fallback defaults for unlisted machines
+defaults:
+  darwin:
+    accent: "#89b4fa"    # blue
+    label: "mac"
+  linux:
+    accent: "#a6e3a1"    # green
+    label: "linux"
