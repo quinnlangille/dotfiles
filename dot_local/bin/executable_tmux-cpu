@@ -1,0 +1,13 @@
+#!/bin/bash
+# CPU load for tmux status bar
+# Returns: " 2.5" (icon + load average)
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS: 1-minute load average
+    load=$(sysctl -n vm.loadavg | awk '{print $2}')
+else
+    # Linux: 1-minute load average
+    load=$(awk '{print $1}' /proc/loadavg)
+fi
+
+echo "󰻠 ${load}"

@@ -1,0 +1,13 @@
+#!/bin/bash
+# Memory usage for tmux status bar
+# Returns: "󰍛 79%" (icon + percentage)
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS: sum process memory usage
+    pct=$(ps -A -o %mem | awk '{s+=$1} END {printf "%.0f", s}')
+else
+    # Linux: use free
+    pct=$(free | awk '/Mem/ {printf "%.0f", $3/$2*100}')
+fi
+
+echo "󰍛 ${pct}%"

@@ -66,9 +66,9 @@ set -g base-index 1
 setw -g pane-base-index 1
 set -g renumber-windows on
 
-# Window naming - show current command or directory
+# Window naming - always show git repo name (if in repo) or directory name
 setw -g automatic-rename on
-setw -g automatic-rename-format '#{?#{==:#{pane_current_command},zsh},#{b:pane_current_path},#{pane_current_command}}'
+setw -g automatic-rename-format '#(~/.local/bin/tmux-window-name "#{pane_current_path}")'
 
 # Faster key repetition
 set -s escape-time 0
@@ -104,6 +104,9 @@ bind -r L resize-pane -R 5
 bind -r n next-window
 bind -r p previous-window
 
+# Toggle automatic-rename (allows manual names to stick)
+bind A setw automatic-rename
+
 # =============================================================================
 # Copy Mode (native-feeling)
 # =============================================================================
@@ -134,12 +137,12 @@ set -g status-style "bg=#1e1e2e,fg=#cdd6f4"
 # Status left: Shows "REMOTE" prefix when tmux is running inside an SSH session
 set -g status-left "#([ -n \"$SSH_CONNECTION\" ] && echo '#[fg=#1e1e2e,bg=#f38ba8,bold] REMOTE #[fg=#f38ba8,bg=#1e1e2e]')#[fg=#1e1e2e,bg={{ $accent }},bold] #S #[fg={{ $accent }},bg=#1e1e2e]"
 
-# Status right: time and machine label
-set -g status-right "#[fg=#45475a]#[fg=#cdd6f4,bg=#45475a] %H:%M #[fg={{ $accent }}]#[fg=#1e1e2e,bg={{ $accent }},bold] {{ $label }} "
+# Status right: system stats, time, and machine label
+set -g status-right "#[fg=#45475a]#[fg=#cdd6f4,bg=#45475a] #(~/.local/bin/tmux-cpu)  #(~/.local/bin/tmux-mem) #[fg=#585b70]│#[fg=#cdd6f4] %H:%M #[fg={{ $accent }}]#[fg=#1e1e2e,bg={{ $accent }},bold] {{ $label }} "
 set -g window-status-current-format "#[fg=#1e1e2e,bg={{ $accent }}] #I:#W "
 
 set -g status-left-length 40
-set -g status-right-length 60
+set -g status-right-length 80
 set -g window-status-format "#[fg=#6c7086] #I:#W "
 set -g window-status-separator ""
 
@@ -153,9 +156,9 @@ set -g window-status-separator ""
 set -g window-status-current-style ""
 set -g @ssh-accent "#fab387"
 
-# Override window format to detect SSH command
-set -g window-status-current-format "#{?#{==:#{pane_current_command},ssh},#[fg=#1e1e2e,bg=#fab387,bold] #I:#W ,#[fg=#1e1e2e,bg={{ $accent }}] #I:#W }"
-set -g window-status-format "#{?#{==:#{pane_current_command},ssh},#[fg=#fab387] #I:#W ,#[fg=#6c7086] #I:#W }"
+# Window format
+set -g window-status-current-format "#[fg=#1e1e2e,bg={{ $accent }},bold] #I:#W "
+set -g window-status-format "#[fg=#6c7086] #I:#W "
 
 # Pane borders
 set -g pane-border-style "fg=#45475a"

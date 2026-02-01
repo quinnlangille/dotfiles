@@ -1,0 +1,12 @@
+#!/bin/bash
+# Window name for tmux - shows git repo name or directory basename
+# Usage: tmux-window-name /path/to/directory
+
+dir="${1:-$PWD}"
+
+# Try to get git repo name
+if git -C "$dir" rev-parse --show-toplevel &>/dev/null; then
+    basename "$(git -C "$dir" rev-parse --show-toplevel)"
+else
+    basename "$dir"
+fi

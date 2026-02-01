@@ -1,5 +1,30 @@
 # Custom Functions
 
+# =============================================================================
+# Terminal Integration
+# =============================================================================
+# Report working directory to terminal via OSC 7
+_osc7_cwd() {
+  printf '\e]7;file://%s%s\e\\' "${HOST}" "${PWD}"
+}
+
+# Update tmux window name to current project/directory
+_tmux_window_name() {
+  if [[ -n "$TMUX" ]]; then
+    local name="$("$HOME/.local/bin/tmux-window-name" "$PWD")"
+    tmux rename-window "$name"
+  fi
+}
+
+autoload -Uz add-zsh-hook
+add-zsh-hook chpwd _osc7_cwd
+add-zsh-hook chpwd _tmux_window_name
+_osc7_cwd  # Report initial directory on shell start
+_tmux_window_name  # Set initial window name
+
+# =============================================================================
+# Utility Functions
+# =============================================================================
 # Create directory and cd into it
 mkcd() {
   mkdir -p "$1" && cd "$1"
