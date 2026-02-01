@@ -30,6 +30,5 @@ zinit wait lucid for \
   OMZP::dirhistory \
   OMZP::git
 
-# fzf-tab for better completion (optional but nice)
-zinit wait lucid for \
-  Aloxaf/fzf-tab
+# fzf-tab disabled - using native zsh completion instead (more minimal/inline)
+# zinit wait lucid for Aloxaf/fzf-tab
