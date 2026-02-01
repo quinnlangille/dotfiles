@@ -48,15 +48,15 @@
 # # Just for example:
 # resize-overlay-duration = 4s 200ms
 
+# Shell
+command = /bin/zsh
+
 # Font (Nerd Font for Neovim icons)
 font-family = MesloLGS Nerd Font Mono
 
 # Theme
 theme = Catppuccin Mocha
 
-{{- if eq .chezmoi.os "linux" }}
-# Linux: Mac-style copy/paste (works with keyd Super→Ctrl remap)
-# keyd remaps Super+C/V to Ctrl+C/V, so we make Ctrl+C/V copy/paste instead of interrupt
-keybind = ctrl+c=copy_to_clipboard
-keybind = ctrl+v=paste_from_clipboard
-{{- end }}
+# Copy/paste with Cmd (Super key on Linux)
+keybind = super+c=copy_to_clipboard
+keybind = super+v=paste_from_clipboard

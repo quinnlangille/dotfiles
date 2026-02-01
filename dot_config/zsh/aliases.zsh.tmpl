@@ -1,0 +1,85 @@
+# Aliases
+
+# Editor
+alias vim='nvim'
+alias vi='nvim'
+alias v='nvim'
+
+# Config shortcuts
+alias zshconfig='nvim ~/.zshrc'
+alias reload='source ~/.zshrc'
+
+# eza (modern ls replacement)
+if command -v eza &>/dev/null; then
+  alias ls='eza --icons --group-directories-first'
+  alias ll='eza -l --icons --group-directories-first --git'
+  alias la='eza -la --icons --group-directories-first --git'
+  alias lt='eza --tree --icons --group-directories-first -L 2'
+  alias lta='eza --tree --icons --group-directories-first -L 2 -a'
+else
+  alias ls='ls --color=auto'
+  alias ll='ls -lh'
+  alias la='ls -lha'
+fi
+
+# bat (modern cat replacement)
+if command -v bat &>/dev/null; then
+  alias cat='bat --paging=never'
+  alias catp='bat'  # bat with paging
+fi
+
+# fd (modern find replacement)
+if command -v fd &>/dev/null; then
+  alias find='fd'
+fi
+
+# zoxide (smart cd)
+if command -v zoxide &>/dev/null; then
+  eval "$(zoxide init zsh)"
+  alias cd='z'
+  alias cdi='zi'  # interactive
+fi
+
+# Git shortcuts (supplement OMZ git plugin)
+alias g='git'
+alias gs='git status'
+alias gd='git diff'
+alias ga='git add'
+alias gc='git commit'
+alias gp='git push'
+alias gl='git pull'
+alias gco='git checkout'
+alias gb='git branch'
+alias glog='git log --oneline --graph --decorate'
+
+# Directory navigation
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+
+# Safety
+alias rm='rm -i'
+alias mv='mv -i'
+alias cp='cp -i'
+
+# Misc
+alias grep='grep --color=auto'
+alias df='df -h'
+alias du='du -h'
+alias free='free -h'
+
+{{- if eq .chezmoi.os "darwin" }}
+# macOS specific
+alias pbcopy='pbcopy'
+alias pbpaste='pbpaste'
+alias flush-dns='sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder'
+{{- else if eq .chezmoi.os "linux" }}
+# Linux specific - clipboard
+if command -v wl-copy &>/dev/null; then
+  alias pbcopy='wl-copy'
+  alias pbpaste='wl-paste'
+elif command -v xclip &>/dev/null; then
+  alias pbcopy='xclip -selection clipboard'
+  alias pbpaste='xclip -selection clipboard -o'
+fi
+{{- end }}
