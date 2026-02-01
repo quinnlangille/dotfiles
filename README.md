@@ -2,6 +2,16 @@
 
 Cross-platform dotfiles managed with [chezmoi](https://chezmoi.io/).
 
+## Philosophy
+
+**Minimal, functional, and intentional.** Every config should earn its place.
+
+- **No bloat** — Only add what's actively used. Remove what isn't.
+- **Readable over clever** — Prefer simple shell scripts over complex one-liners.
+- **Cross-platform by default** — Use chezmoi templates for OS-specific logic.
+- **Useful at a glance** — Status bars show actionable info (project name, system stats), not decoration.
+- **Low maintenance** — Avoid plugins and dependencies where native solutions work.
+
 ## Quick Start (New Machine)
 
 ```bash
@@ -67,7 +77,7 @@ If your machine isn't listed, it falls back to:
 
 | Config | Description |
 |--------|-------------|
-| `tmux` | Catppuccin theme, Ctrl+a prefix, F12 nested session toggle |
+| `tmux` | Catppuccin theme, Ctrl+a prefix, CPU/mem stats, git-aware window names |
 | `ghostty` | Terminal config with OS-specific keybindings |
 | `nvim` | Neovim based on kickstart.nvim |
 | `zsh` | oh-my-zsh configuration |
