@@ -17,6 +17,9 @@ export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 
+# User binaries
+export PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+
 # Editor
 export EDITOR='nvim'
 export VISUAL='nvim'
@@ -35,9 +38,15 @@ do
 done
 unset config_file
 
+# NVM (Node Version Manager) - must come after completion.zsh for compdef
+export NVM_DIR="$HOME/.nvm"
+{{- if eq .chezmoi.os "darwin" }}
+[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"
+[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
+{{- else }}
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+{{- end }}
+
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
-{{- if .chezmoi.hostname | eq "specific-machine" }}
-# Machine-specific configuration for specific-machine
-{{- end }}

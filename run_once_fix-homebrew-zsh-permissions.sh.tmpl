@@ -1,0 +1,18 @@
+{{- if eq .chezmoi.os "darwin" -}}
+#!/bin/bash
+# Fix Homebrew zsh directory permissions for compinit
+# These directories often have group-write permissions which zsh considers insecure
+
+HOMEBREW_ZSH_DIRS=(
+  "/opt/homebrew/share/zsh"
+  "/opt/homebrew/share/zsh/site-functions"
+  "/usr/local/share/zsh"
+  "/usr/local/share/zsh/site-functions"
+)
+
+for dir in "${HOMEBREW_ZSH_DIRS[@]}"; do
+  if [[ -d "$dir" ]]; then
+    chmod g-w "$dir" 2>/dev/null && echo "Fixed permissions: $dir"
+  fi
+done
+{{- end -}}

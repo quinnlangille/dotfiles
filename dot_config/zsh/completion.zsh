@@ -1,12 +1,14 @@
 # Completion System Configuration
 
-# Initialize completion (handled by zinit, but kept as fallback)
-autoload -Uz compinit
-# Only regenerate .zcompdump once a day
-if [[ -n ${ZDOTDIR:-$HOME}/.zcompdump(#qN.mh+24) ]]; then
-  compinit
-else
-  compinit -C
+# Note: compinit is handled by zinit in plugins.zsh (zicompinit)
+# Only load compinit here if zinit hasn't been sourced
+if (( ! ${+functions[zinit]} )); then
+  autoload -Uz compinit
+  if [[ -n ${ZDOTDIR:-$HOME}/.zcompdump(#qN.mh+24) ]]; then
+    compinit
+  else
+    compinit -C
+  fi
 fi
 
 # Completion options

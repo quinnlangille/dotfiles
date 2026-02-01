@@ -10,9 +10,9 @@ setopt EXTENDED_GLOB        # Extended globbing
 setopt GLOB_DOTS            # Include dotfiles in globbing
 setopt NO_CASE_GLOB         # Case insensitive globbing
 
-# Correction
-setopt CORRECT              # Command correction
-setopt CORRECT_ALL          # Argument correction
+# Correction (disabled - too aggressive with tools like 'claude')
+# setopt CORRECT              # Command correction
+# setopt CORRECT_ALL          # Argument correction
 
 # Job Control
 setopt NO_BG_NICE           # Don't nice background jobs

@@ -34,6 +34,9 @@ bind -T root F12 \
   set window-status-current-format "#[fg=#6c7086,bg=#313244] #I:#W " \;\
   refresh-client -S
 
+# In 'off' mode: send prefix key (C-a) directly to inner tmux
+bind -T off C-a send-keys C-a
+
 bind -T off F12 \
   set -u prefix \;\
   set -u key-table \;\
@@ -46,6 +49,9 @@ bind -T off F12 \
 # =============================================================================
 # General Settings
 # =============================================================================
+# Update environment variables when attaching (includes SSH_CONNECTION)
+set -g update-environment "SSH_CONNECTION SSH_CLIENT SSH_TTY DISPLAY"
+
 set -g default-shell /bin/zsh
 set -g default-terminal "tmux-256color"
 set -ag terminal-overrides ",xterm-256color:RGB"
@@ -59,6 +65,10 @@ set -g mouse on
 set -g base-index 1
 setw -g pane-base-index 1
 set -g renumber-windows on
+
+# Window naming - show current command or directory
+setw -g automatic-rename on
+setw -g automatic-rename-format '#{?#{==:#{pane_current_command},zsh},#{b:pane_current_path},#{pane_current_command}}'
 
 # Faster key repetition
 set -s escape-time 0
@@ -120,14 +130,32 @@ bind -T copy-mode-vi MouseDragEnd1Pane send -X copy-pipe-and-cancel "wl-copy"
 # Status Bar - Catppuccin Mocha (accent: {{ $accent }})
 # =============================================================================
 set -g status-style "bg=#1e1e2e,fg=#cdd6f4"
-set -g status-left "#[fg=#1e1e2e,bg={{ $accent }},bold] #S #[fg={{ $accent }},bg=#1e1e2e]"
+
+# Status left: Shows "REMOTE" prefix when tmux is running inside an SSH session
+set -g status-left "#([ -n \"$SSH_CONNECTION\" ] && echo '#[fg=#1e1e2e,bg=#f38ba8,bold] REMOTE #[fg=#f38ba8,bg=#1e1e2e]')#[fg=#1e1e2e,bg={{ $accent }},bold] #S #[fg={{ $accent }},bg=#1e1e2e]"
+
+# Status right: time and machine label
 set -g status-right "#[fg=#45475a]#[fg=#cdd6f4,bg=#45475a] %H:%M #[fg={{ $accent }}]#[fg=#1e1e2e,bg={{ $accent }},bold] {{ $label }} "
 set -g window-status-current-format "#[fg=#1e1e2e,bg={{ $accent }}] #I:#W "
 
-set -g status-left-length 30
-set -g status-right-length 50
+set -g status-left-length 40
+set -g status-right-length 60
 set -g window-status-format "#[fg=#6c7086] #I:#W "
 set -g window-status-separator ""
+
+# =============================================================================
+# SSH Session Detection - Per-window visual indicator
+# =============================================================================
+# When a pane is running SSH, the window shows with warning color (peach/orange)
+# This uses automatic-rename to detect 'ssh' as the current command
+
+# Style for windows running SSH (peach/orange from Catppuccin)
+set -g window-status-current-style ""
+set -g @ssh-accent "#fab387"
+
+# Override window format to detect SSH command
+set -g window-status-current-format "#{?#{==:#{pane_current_command},ssh},#[fg=#1e1e2e,bg=#fab387,bold] #I:#W ,#[fg=#1e1e2e,bg={{ $accent }}] #I:#W }"
+set -g window-status-format "#{?#{==:#{pane_current_command},ssh},#[fg=#fab387] #I:#W ,#[fg=#6c7086] #I:#W }"
 
 # Pane borders
 set -g pane-border-style "fg=#45475a"

@@ -73,6 +73,7 @@ alias free='free -h'
 alias pbcopy='pbcopy'
 alias pbpaste='pbpaste'
 alias flush-dns='sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder'
+alias tailscale='/Applications/Tailscale.app/Contents/MacOS/Tailscale'
 {{- else if eq .chezmoi.os "linux" }}
 # Linux specific - clipboard
 if command -v wl-copy &>/dev/null; then

@@ -3,6 +3,9 @@
 # Use emacs keybindings
 bindkey -e
 
+# Tab completion (explicit binding to ensure it works)
+bindkey '^I' expand-or-complete
+
 # History search with up/down arrows
 autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
 zle -N up-line-or-beginning-search
