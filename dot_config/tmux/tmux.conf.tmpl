@@ -66,9 +66,9 @@ set -g base-index 1
 setw -g pane-base-index 1
 set -g renumber-windows on
 
-# Window naming - always show git repo name (if in repo) or directory name
-setw -g automatic-rename on
-setw -g automatic-rename-format '#(~/.local/bin/tmux-window-name "#{pane_current_path}")'
+# Window naming - use hooks for reliable updates when changing directories
+setw -g automatic-rename off
+set-hook -g pane-focus-in 'run-shell "tmux rename-window \"$(~/.local/bin/tmux-window-name #{pane_current_path})\""'
 
 # Faster key repetition
 set -s escape-time 0
