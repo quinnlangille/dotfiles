@@ -55,11 +55,14 @@ set -g update-environment "SSH_CONNECTION SSH_CLIENT SSH_TTY DISPLAY"
 set -g default-shell /bin/zsh
 set -g default-terminal "tmux-256color"
 set -ag terminal-overrides ",xterm-256color:RGB"
+# Enable OSC 52 clipboard for nested tmux sessions (local tmux → SSH → remote tmux)
+set -as terminal-features ',tmux-256color:clipboard'
 set -g history-limit 50000
 set -g display-time 4000
 set -g status-interval 5
 set -g focus-events on
 set -g mouse on
+set -s set-clipboard on
 
 # Start windows and panes at 1, not 0
 set -g base-index 1
@@ -115,18 +118,18 @@ setw -g mode-keys vi
 # Enter copy mode with prefix+[
 bind [ copy-mode
 
-# Vi-style selection
+# Vi-style selection and yank
+# OSC 52 (set-clipboard) sends copied text to the local terminal over SSH
 bind -T copy-mode-vi v send -X begin-selection
-bind -T copy-mode-vi y send -X copy-selection-and-cancel
 
 {{- if eq .chezmoi.os "darwin" }}
-# macOS: copy to system clipboard
+# macOS: pipe to pbcopy as well
 bind -T copy-mode-vi y send -X copy-pipe-and-cancel "pbcopy"
 bind -T copy-mode-vi MouseDragEnd1Pane send -X copy-pipe-and-cancel "pbcopy"
 {{- else }}
-# Linux: copy to system clipboard (Wayland)
-bind -T copy-mode-vi y send -X copy-pipe-and-cancel "wl-copy"
-bind -T copy-mode-vi MouseDragEnd1Pane send -X copy-pipe-and-cancel "wl-copy"
+# Linux: pipe to wl-copy if available (local Wayland), otherwise OSC 52 handles it
+bind -T copy-mode-vi y send -X copy-pipe-and-cancel "wl-copy 2>/dev/null || true"
+bind -T copy-mode-vi MouseDragEnd1Pane send -X copy-pipe-and-cancel "wl-copy 2>/dev/null || true"
 {{- end }}
 
 # =============================================================================
