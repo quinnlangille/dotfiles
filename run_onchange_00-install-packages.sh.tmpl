@@ -1,0 +1,36 @@
+{{- if eq .chezmoi.os "darwin" -}}
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "==> Installing Homebrew packages..."
+
+brew bundle --no-lock --file=/dev/stdin <<EOF
+# Shell
+brew "bat"
+brew "fzf"
+brew "direnv"
+brew "the_silver_searcher"
+brew "tmux"
+brew "sshs"
+
+# Editor
+brew "neovim"
+
+# Dev tools
+brew "gh"
+brew "jq"
+brew "yq"
+
+# Runtime
+brew "nvm"
+
+# Cloud
+brew "awscli"
+
+# Casks
+cask "ngrok"
+cask "stats"
+EOF
+
+echo "==> Homebrew packages installed."
+{{ end -}}
