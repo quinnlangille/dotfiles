@@ -29,6 +29,7 @@ echo "==> Installing chezmoi..."
 brew install chezmoi
 
 echo "==> Applying dotfiles..."
+rm -rf "${HOME}/.local/share/chezmoi"
 chezmoi init --apply quinnlangille
 
 echo "==> Done! Restart your shell to pick up all changes."
