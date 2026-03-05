@@ -42,7 +42,6 @@ echo "==> Installing apt packages..."
 sudo apt-get update -qq
 sudo apt-get install -y -qq \
   zsh \
-  neovim \
   tmux \
   bat \
   fzf \
@@ -51,7 +50,15 @@ sudo apt-get install -y -qq \
   jq \
   curl \
   git \
+  wget \
   unzip
+
+# Install latest Neovim via AppImage (apt version is too old)
+echo "==> Installing latest Neovim..."
+curl -Lo /tmp/nvim-linux-x86_64.appimage https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.appimage
+chmod u+x /tmp/nvim-linux-x86_64.appimage
+mkdir -p ~/.local/bin
+mv /tmp/nvim-linux-x86_64.appimage ~/.local/bin/nvim
 
 # Symlink batcat -> bat (Ubuntu names it batcat)
 if command -v batcat &>/dev/null && ! command -v bat &>/dev/null; then
