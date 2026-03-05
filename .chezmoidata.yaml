@@ -13,14 +13,9 @@ machines:
     accent: "#94e2d5"    # teal
     label: "gaming"
 
-  # Add machines as you migrate them:
-  # macbook-pro:
-  #   accent: "#b4befe"  # lavender
-  #   label: "mbp"
-  #
-  # dev-server:
-  #   accent: "#fab387"  # peach
-  #   label: "dev"
+  megaboss:
+    accent: "#f9e2af"    # yellow
+    label: "megaboss"
 
 # Fallback defaults for unlisted machines
 defaults:
