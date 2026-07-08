@@ -11,6 +11,7 @@ brew "fzf"
 brew "direnv"
 brew "the_silver_searcher"
 brew "tmux"
+brew "herdr"
 brew "sshs"
 
 # Editor
@@ -107,6 +108,12 @@ fi
 if ! command -v fnm &>/dev/null; then
   echo "==> Installing fnm..."
   curl -fsSL https://fnm.vercel.app/install | bash -s -- --skip-shell --install-dir "$HOME/.local/bin"
+fi
+
+# Install herdr if not present (single Rust binary; not in apt)
+if ! command -v herdr &>/dev/null; then
+  echo "==> Installing herdr..."
+  curl -fsSL https://herdr.dev/install.sh | sh
 fi
 
 echo "==> Linux packages installed."

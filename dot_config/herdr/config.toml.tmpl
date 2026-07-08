@@ -1,0 +1,79 @@
+# herdr config - managed by chezmoi
+# Ported from ~/.config/tmux/tmux.conf to preserve tmux muscle memory.
+# Schema reference: `herdr --default-config`. Validate a change with:
+#   herdr server reload-config   (look for diagnostics: [] / status: applied)
+
+{{- /* Resolve machine config: check machines map, fall back to OS defaults.
+       Same logic as dot_config/tmux/tmux.conf.tmpl so accent stays in sync. */ -}}
+{{- $machine := index .machines .chezmoi.hostname -}}
+{{- if not $machine -}}
+  {{- $machine = index .defaults .chezmoi.os -}}
+{{- end -}}
+{{- $accent := $machine.accent -}}
+
+# =============================================================================
+# Machine: {{ .chezmoi.hostname }} | Accent: {{ $accent }}
+# =============================================================================
+
+[theme]
+# Catppuccin Mocha - matches the previous tmux status bar palette.
+name = "catppuccin"
+
+[theme.custom]
+# Per-machine accent from .chezmoidata.yaml (identical value tmux used).
+accent = "{{ $accent }}"
+
+[terminal]
+# New panes/tabs inherit the current pane's directory.
+# (tmux used `-c "#{pane_current_path}"` on every split/new-window.)
+new_cwd = "follow"
+# default_shell empty -> use $SHELL (zsh); more portable than tmux's hardcoded /bin/zsh.
+
+[keys]
+# Prefix Ctrl+a everywhere (tmux: `set -g prefix C-a`).
+prefix = "ctrl+a"
+
+# --- Splits (tmux: | = side-by-side, - = stacked) ---
+split_vertical   = "prefix+|"     # | -> vertical divider  -> panes side-by-side
+split_horizontal = "prefix+minus" # - -> horizontal divider -> panes stacked
+close_pane       = "prefix+x"
+zoom             = "prefix+z"      # tmux pane zoom / fullscreen
+resize_mode      = "prefix+r"      # enter resize mode, then h/j/k/l or arrows
+                                   # (replaces tmux's `bind -r H/J/K/L resize-pane`)
+
+# --- Vim-style pane navigation (tmux: `bind h/j/k/l select-pane`) ---
+focus_pane_left  = "prefix+h"
+focus_pane_down  = "prefix+j"
+focus_pane_up    = "prefix+k"
+focus_pane_right = "prefix+l"
+
+# --- Tabs in herdr == windows in tmux ---
+new_tab      = "prefix+c"          # new window in current path
+next_tab     = "prefix+n"
+previous_tab = "prefix+p"
+
+# --- Copy / scrollback (tmux: `bind [ copy-mode`) ---
+# herdr has no tmux-style copy-mode; scrollback editing is the closest analogue.
+edit_scrollback = "prefix+["
+
+# --- Agent sidebar (herdr-only; the whole reason to switch from tmux) ---
+toggle_sidebar = "prefix+b"
+
+[ui]
+# Accent for borders/highlights/nav, matched to the theme accent.
+accent = "{{ $accent }}"
+mouse_capture = true               # tmux: `set -g mouse on`
+
+[session]
+# Resume AI-agent panes into their conversations after a server restart.
+resume_agents_on_restore = true
+
+# =============================================================================
+# Intentionally NOT ported from tmux (no herdr equivalent / superseded):
+#   - F12 nested-session passthrough: herdr's model is `herdr --remote` over ssh,
+#     not nested multiplexers, so the outer/inner toggle is unnecessary.
+#   - Custom status-left/right (CPU/mem/clock/REMOTE badge, tmux-cpu/tmux-mem
+#     helper scripts): herdr renders its own agent-state sidebar instead of a
+#     scriptable status line. The tmux helper scripts stay with the tmux config.
+#   - OSC52 / pbcopy yank bindings: herdr handles clipboard automatically.
+# =============================================================================
