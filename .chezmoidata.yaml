@@ -9,6 +9,12 @@
 #   blue:      "#89b4fa"  lavender: "#b4befe"
 
 machines:
+  # NOTE: keys must match each machine's real OS hostname (`hostname -s`,
+  # i.e. chezmoi's .chezmoi.hostname) — NOT the Tailscale name or SSH alias.
+  MacBookPro:            # control plane (this machine)
+    accent: "#cba6f7"    # mauve
+    label: "control"
+
   big-rig-gaming:
     accent: "#94e2d5"    # teal
     label: "gaming"
@@ -16,6 +22,10 @@ machines:
   megaboss:
     accent: "#f9e2af"    # yellow
     label: "megaboss"
+
+  miniboss:              # Mac mini — verify `hostname -s` == "miniboss" for accent to apply
+    accent: "#74c7ec"    # sapphire
+    label: "miniboss"
 
 # Fallback defaults for unlisted machines
 defaults:

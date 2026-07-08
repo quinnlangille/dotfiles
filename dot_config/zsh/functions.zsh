@@ -109,3 +109,71 @@ if command -v fzf &>/dev/null; then
     fi
   }
 fi
+
+# =============================================================================
+# herdr: per-host tab naming + pane tint on interactive SSH
+# =============================================================================
+# When you `ssh <host>` inside herdr, the current tab is renamed to the host,
+# a bright per-host banner is printed, and the pane background is tinted (if
+# herdr honors OSC 11). Only fires for interactive logins inside herdr; plain
+# `ssh host <cmd>`, scp, and git-over-ssh are untouched.
+#
+# Colors mirror ~/.local/share/chezmoi/.chezmoidata.yaml `machines:` accents.
+# Add a host by extending both maps below. Manual rename still works anytime
+# (prefix+shift+t, or `herdr tab rename <tab_id> <name>`); this only sets the
+# name on connect and never overrides a later manual rename.
+if [[ -n "$HERDR_ENV" ]]; then
+  # Bright accent (banner) — keep in sync with .chezmoidata.yaml
+  typeset -gA _herdr_host_accent=(
+    megaboss       "#f9e2af"   # yellow
+    megaboss-local "#f9e2af"
+    miniboss       "#74c7ec"   # sapphire
+    big-rig-gaming "#94e2d5"   # teal
+  )
+  # Dark, readable pane background per host (OSC 11 tint)
+  typeset -gA _herdr_host_bg=(
+    megaboss       "#2b2600"
+    megaboss-local "#2b2600"
+    miniboss       "#01212b"
+    big-rig-gaming "#04231f"
+  )
+
+  _herdr_hex_rgb() {  # "#rrggbb" -> "r;g;b"
+    local h="$1"; print -r -- "$(( 16#${h[2,3]} ));$(( 16#${h[4,5]} ));$(( 16#${h[6,7]} ))"
+  }
+  _herdr_banner() {   # $1 accent hex, $2 label
+    printf '\e[48;2;%sm\e[38;2;0;0;0m %s \e[0m\n' "$(_herdr_hex_rgb "$1")" "$2"
+  }
+
+  ssh() {
+    emulate -L zsh
+    # Only decorate interactive logins inside herdr with a real tty.
+    if [[ -z "$HERDR_ENV" || ! -t 1 ]]; then command ssh "$@"; return; fi
+
+    # Find the destination and detect a trailing remote command.
+    local -a a=("$@"); local wantsarg="bcDeFIiJLlmOopQRSWw"
+    local host="" hadcmd=0 i=1 tok
+    while (( i <= $#a )); do
+      tok="${a[i]}"
+      if [[ "$tok" == -- ]]; then :
+      elif [[ "$tok" == -?* ]]; then
+        # consume an option-argument for flags that take one (e.g. -p 22, -o ...)
+        [[ ${#tok} -eq 2 && "$wantsarg" == *"${tok[2]}"* ]] && (( i++ ))
+      elif [[ -z "$host" ]]; then host="$tok"
+      else hadcmd=1; break; fi
+      (( i++ ))
+    done
+    if [[ -z "$host" || $hadcmd -eq 1 ]]; then command ssh "$@"; return; fi
+
+    local label="${host#*@}"                     # strip user@
+    [[ -n "$HERDR_TAB_ID" ]] && herdr tab rename "$HERDR_TAB_ID" "$label" >/dev/null 2>&1
+    local accent="${_herdr_host_accent[$label]}" bg="${_herdr_host_bg[$label]}"
+    [[ -n "$accent" ]] && _herdr_banner "$accent" "$label"
+    [[ -n "$bg" ]] && printf '\e]11;%s\e\\' "$bg"   # set pane background
+
+    command ssh "$@"
+    local rc=$?
+    [[ -n "$bg" ]] && printf '\e]111\e\\'           # reset pane background
+    return $rc
+  }
+fi
