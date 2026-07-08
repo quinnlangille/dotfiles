@@ -69,6 +69,19 @@ mouse_capture = true               # tmux: `set -g mouse on`
 # Resume AI-agent panes into their conversations after a server restart.
 resume_agents_on_restore = true
 
+[remote]
+# Use ~/.ssh/config unchanged for `herdr --remote` instead of herdr's generated
+# config. Our SSH hosts are Tailnet aliases (Host megaboss -> HostName
+# 100.110.123.102); herdr's managed config mis-resolved the bare name to
+# 127.0.1.1 and failed auth. Plain `ssh <host>` already works, so defer to it.
+# (We already set ServerAliveInterval + ControlMaster in ~/.ssh/config.)
+# NOTE: we do NOT nest herdr-in-herdr (allow_nested stays default false). The
+# workflow is: ssh into a box from a local herdr tab, then run tmux *inside* the
+# ssh session for tabs/panes on the remote. `herdr --remote` remains usable from
+# a plain (non-herdr) terminal if ever needed; this fix just makes it resolve
+# Tailnet hosts correctly instead of misfiring to 127.0.1.1.
+manage_ssh_config = false
+
 # =============================================================================
 # Intentionally NOT ported from tmux (no herdr equivalent / superseded):
 #   - F12 nested-session passthrough: herdr's model is `herdr --remote` over ssh,
