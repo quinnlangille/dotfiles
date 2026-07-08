@@ -13,10 +13,11 @@
 # Machine: {{ .chezmoi.hostname }} | Accent: {{ $accent }}
 # =============================================================================
 
-# Prefix Key - Ctrl+a everywhere
-unbind C-b
-set -g prefix C-a
-bind C-a send-prefix
+# Prefix Key - Ctrl+b (tmux is the INNER multiplexer now that herdr replaced
+# local tmux). herdr owns Ctrl+a as the OUTER prefix; keeping tmux on its
+# default Ctrl+b avoids the collision when running tmux inside a herdr SSH tab.
+set -g prefix C-b
+bind C-b send-prefix
 
 # =============================================================================
 # Nested Session Handling (F12 to toggle)
@@ -34,8 +35,8 @@ bind -T root F12 \
   set window-status-current-format "#[fg=#6c7086,bg=#313244] #I:#W " \;\
   refresh-client -S
 
-# In 'off' mode: send prefix key (C-a) directly to inner tmux
-bind -T off C-a send-keys C-a
+# In 'off' mode: send prefix key (C-b) directly to inner tmux
+bind -T off C-b send-keys C-b
 
 bind -T off F12 \
   set -u prefix \;\
