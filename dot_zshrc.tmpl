@@ -40,7 +40,14 @@ unset config_file
 
 # fnm (Fast Node Manager)
 if command -v fnm &>/dev/null; then
-  eval "$(fnm env --use-on-cd)"
+  eval "$(fnm env --use-on-cd --shell zsh)"
+fi
+
+# bun (JS runtime) — only load where it's installed (inert on other machines)
+if [[ -d "$HOME/.bun" ]]; then
+  [[ -s "$HOME/.bun/_bun" ]] && source "$HOME/.bun/_bun"   # completions
+  export BUN_INSTALL="$HOME/.bun"
+  export PATH="$BUN_INSTALL/bin:$PATH"
 fi
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
