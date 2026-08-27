@@ -13,3 +13,10 @@ install.sh
 .pi/agent/git
 .pi/agent/npm
 .pi/agent/pi-debug.log
+
+# opencode runtime state — credentials, sessions, logs, caches.
+# Config lives at ~/.config/opencode/opencode.json and IS managed; opencode
+# only reads it, so it can be a normal managed file rather than a seed.
+.local/share/opencode
+.local/state/opencode
+.cache/opencode

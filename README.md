@@ -84,6 +84,7 @@ If your machine isn't listed, it falls back to:
 | `MangoHud` | Gaming overlay (Linux only) |
 | `herdr` | Terminal multiplexer with agent sidebar; tmux keybindings ported |
 | `pi` | Coding agent CLI, pinned version, OpenRouter as provider |
+| `opencode` | Coding agent CLI, pinned version, OpenRouter as provider |
 
 ## Tmux Nested Sessions
 
@@ -104,30 +105,46 @@ EOF
 `.zshrc` sources it last, so exports here are inherited by every child process in the
 session. For anything that isn't genuinely global, prefer a per-project `.envrc` (direnv).
 
-## pi (Coding Agent)
+## Coding Agents (pi, opencode)
 
-[pi](https://pi.dev) is installed by `run_onchange_10-install-pi.sh` at a **pinned version**,
-into `~/.local` rather than the fnm node tree — so `fnm use <other-version>` doesn't lose it.
+Both [pi](https://pi.dev) and [opencode](https://opencode.ai) are installed at **pinned
+versions** into `~/.local`, by `run_onchange_10-install-pi.sh` and
+`run_onchange_11-install-opencode.sh`. Installing outside the fnm node tree means
+`fnm use <other-version>` doesn't lose them.
 
-| Path | What it is |
-|------|-----------|
-| `run_onchange_10-install-pi.sh` | Installer; owns which version every machine runs |
-| `private_dot_pi/private_agent/create_private_settings.json` | Seed for `~/.pi/agent/settings.json` |
+| Agent | Config (managed) | Upgrade by |
+|-------|------------------|-----------|
+| `pi` | `~/.pi/agent/settings.json` (seeded once) | bump `PI_VERSION` |
+| `opencode` | `~/.config/opencode/opencode.json` (fully managed) | bump `OPENCODE_VERSION` |
 
-**Upgrading:** bump `PI_VERSION` in the install script, commit, then `chezmoi apply` on each
-machine. Do **not** run `pi update` — it installs outside the prefix and drifts from the repo.
-Requires Node >= 22.19.0; the script fails loudly rather than letting npm install a broken tree.
+**Upgrading:** bump the version in the relevant install script, commit, then `chezmoi apply`
+on each machine. Do **not** use `pi update` or `opencode upgrade` — both install outside the
+prefix and drift from the repo.
 
-**Provider:** OpenRouter, via `OPENROUTER_API_KEY` (see Machine-Local Secrets above). Without
-it pi starts with zero models. Switch models in-session with `/model`; Ctrl+S saves the default.
+**Provider:** both use OpenRouter via `OPENROUTER_API_KEY` (see Machine-Local Secrets above).
+Neither needs its own login; without the key both start with zero models. Runtime state
+(credentials, sessions, caches) is listed in `.chezmoiignore`, so `chezmoi add` can never
+sweep credentials into git.
 
-**Why the settings seed is `create_`:** pi writes `~/.pi/agent/settings.json` itself whenever you
-use `/settings` or Ctrl+S. A normally-managed file would make every in-app preference change
-look like drift, and `chezmoi apply` would silently revert it. `create_` seeds new machines and
-then leaves the file alone — so changing the seed does **not** propagate to existing machines.
+### Why the two configs are managed differently
 
-pi's runtime state (`auth.json`, `trust.json`, `sessions/`, caches) is listed in `.chezmoiignore`,
-so `chezmoi add ~/.pi` can never sweep credentials into git.
+`opencode.json` is read-only to opencode, so it is a normal managed file — edit it here and
+the change propagates to every machine on `chezmoi update`.
+
+pi is different: it **writes** `~/.pi/agent/settings.json` itself whenever you use `/settings`
+or Ctrl+S in `/model`. Managing it normally would make every in-app preference change look
+like drift, and `chezmoi apply` would silently revert it. So the source file uses chezmoi's
+`create_` attribute: it seeds new machines and then leaves the file alone. Consequence:
+**changing the pi seed does not propagate to machines that already have the file.**
+
+### Install-flag gotcha
+
+pi is installed with `--ignore-scripts` (it needs no lifecycle scripts). opencode is **not** —
+its `postinstall` picks the right native binary out of its `optionalDependencies` and copies it
+into `bin/`. Skipping it leaves a non-functional stub. Don't unify the two flags.
+
+pi additionally requires Node >= 22.19.0 at runtime; opencode ships a native binary and needs
+node only to install.
 
 ## Common Commands
 
