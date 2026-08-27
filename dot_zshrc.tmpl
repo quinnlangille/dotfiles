@@ -32,7 +32,8 @@ for config_file in \
   "$XDG_CONFIG_HOME/zsh/keybindings.zsh" \
   "$XDG_CONFIG_HOME/zsh/plugins.zsh" \
   "$XDG_CONFIG_HOME/zsh/aliases.zsh" \
-  "$XDG_CONFIG_HOME/zsh/functions.zsh"
+  "$XDG_CONFIG_HOME/zsh/functions.zsh" \
+  "$XDG_CONFIG_HOME/zsh/secrets.zsh"
 do
   [[ -f "$config_file" ]] && source "$config_file"
 done
@@ -48,6 +49,11 @@ if [[ -d "$HOME/.bun" ]]; then
   [[ -s "$HOME/.bun/_bun" ]] && source "$HOME/.bun/_bun"   # completions
   export BUN_INSTALL="$HOME/.bun"
   export PATH="$BUN_INSTALL/bin:$PATH"
+fi
+
+# direnv (per-directory env) — must load after PATH is settled
+if command -v direnv &>/dev/null; then
+  eval "$(direnv hook zsh)"
 fi
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
