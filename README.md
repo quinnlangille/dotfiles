@@ -126,6 +126,16 @@ Neither needs its own login; without the key both start with zero models. Runtim
 (credentials, sessions, caches) is listed in `.chezmoiignore`, so `chezmoi add` can never
 sweep credentials into git.
 
+**Permissions:** opencode's config sets `"permission": "allow"`, so it never prompts.
+Its defaults only ask for three things — shell commands touching paths outside the project
+(`external_directory`), the runaway-loop guard (`doom_loop`), and reading `*.env` files.
+Blanket allow drops all three, including the `.env` read guard: the agent can read a project's
+`.env` and send it to the model. Narrow it with the object form if that matters on a machine:
+
+```json
+{ "permission": { "external_directory": "allow", "doom_loop": "allow" } }
+```
+
 ### Why the two configs are managed differently
 
 `opencode.json` is read-only to opencode, so it is a normal managed file — edit it here and
