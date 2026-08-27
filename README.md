@@ -136,6 +136,18 @@ Blanket allow drops all three, including the `.env` read guard: the agent can re
 { "permission": { "external_directory": "allow", "doom_loop": "allow" } }
 ```
 
+**Permissions:** opencode's defaults only prompt for three things — shell commands touching
+paths outside the project (`external_directory`), the runaway-loop guard (`doom_loop`), and
+reading `*.env` files. The config allows `external_directory`, which is the one that fires
+constantly; `doom_loop` and the `.env` read guard are deliberately left asking.
+
+```json
+{ "permission": { "external_directory": "allow" } }
+```
+
+Setting `"permission": "allow"` as a bare string silences everything, including the `.env`
+guard — meaning the agent can read a project's `.env` and send it to the model. Avoid.
+
 ### Why the two configs are managed differently
 
 `opencode.json` is read-only to opencode, so it is a normal managed file — edit it here and
