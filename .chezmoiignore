@@ -1,2 +1,15 @@
 README.md
 install.sh
+
+# pi runtime state — credentials, trust decisions, session history, caches.
+# Ignored so `chezmoi add ~/.pi` can never sweep the auth file into git.
+# Deliberately NOT ignored, so they can be managed later: settings.json,
+# AGENTS.md, SYSTEM.md, keybindings.json, models.json, skills/, prompts/,
+# extensions/, themes/.
+.pi/agent/auth.json
+.pi/agent/trust.json
+.pi/agent/models-store.json
+.pi/agent/sessions
+.pi/agent/git
+.pi/agent/npm
+.pi/agent/pi-debug.log

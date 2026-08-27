@@ -82,10 +82,52 @@ If your machine isn't listed, it falls back to:
 | `nvim` | Neovim based on kickstart.nvim |
 | `zsh` | oh-my-zsh configuration |
 | `MangoHud` | Gaming overlay (Linux only) |
+| `herdr` | Terminal multiplexer with agent sidebar; tmux keybindings ported |
+| `pi` | Coding agent CLI, pinned version, OpenRouter as provider |
 
 ## Tmux Nested Sessions
 
 When SSH'd into another machine running tmux, press `F12` to toggle the outer tmux off. The status bar dims and shows "OFF", and all keys pass through to the inner tmux. Press `F12` again to re-enable.
+
+## Machine-Local Secrets
+
+API keys live in `~/.config/zsh/secrets.zsh` — **untracked, mode 600, never in this repo**.
+`chezmoi init --apply` does not create it; every new machine needs it written by hand:
+
+```bash
+install -m 600 /dev/null ~/.config/zsh/secrets.zsh
+cat >> ~/.config/zsh/secrets.zsh <<'EOF'
+export OPENROUTER_API_KEY=sk-or-v1-...
+EOF
+```
+
+`.zshrc` sources it last, so exports here are inherited by every child process in the
+session. For anything that isn't genuinely global, prefer a per-project `.envrc` (direnv).
+
+## pi (Coding Agent)
+
+[pi](https://pi.dev) is installed by `run_onchange_10-install-pi.sh` at a **pinned version**,
+into `~/.local` rather than the fnm node tree — so `fnm use <other-version>` doesn't lose it.
+
+| Path | What it is |
+|------|-----------|
+| `run_onchange_10-install-pi.sh` | Installer; owns which version every machine runs |
+| `private_dot_pi/private_agent/create_private_settings.json` | Seed for `~/.pi/agent/settings.json` |
+
+**Upgrading:** bump `PI_VERSION` in the install script, commit, then `chezmoi apply` on each
+machine. Do **not** run `pi update` — it installs outside the prefix and drifts from the repo.
+Requires Node >= 22.19.0; the script fails loudly rather than letting npm install a broken tree.
+
+**Provider:** OpenRouter, via `OPENROUTER_API_KEY` (see Machine-Local Secrets above). Without
+it pi starts with zero models. Switch models in-session with `/model`; Ctrl+S saves the default.
+
+**Why the settings seed is `create_`:** pi writes `~/.pi/agent/settings.json` itself whenever you
+use `/settings` or Ctrl+S. A normally-managed file would make every in-app preference change
+look like drift, and `chezmoi apply` would silently revert it. `create_` seeds new machines and
+then leaves the file alone — so changing the seed does **not** propagate to existing machines.
+
+pi's runtime state (`auth.json`, `trust.json`, `sessions/`, caches) is listed in `.chezmoiignore`,
+so `chezmoi add ~/.pi` can never sweep credentials into git.
 
 ## Common Commands
 
