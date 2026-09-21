@@ -58,6 +58,9 @@ set -g default-terminal "tmux-256color"
 set -ag terminal-overrides ",xterm-256color:RGB"
 # Enable OSC 52 clipboard for nested tmux sessions (local tmux → SSH → remote tmux)
 set -as terminal-features ',tmux-256color:clipboard'
+# herdr/ghostty (and mosh) attach us as xterm-256color; list it too so tmux
+# emits OSC 52 even where that terminfo entry lacks Ms.
+set -as terminal-features ',xterm-256color:clipboard'
 set -g history-limit 50000
 set -g display-time 4000
 set -g status-interval 5
@@ -123,15 +126,14 @@ bind [ copy-mode
 # OSC 52 (set-clipboard) sends copied text to the local terminal over SSH
 bind -T copy-mode-vi v send -X begin-selection
 
-{{- if eq .chezmoi.os "darwin" }}
-# macOS: pipe to pbcopy as well
-bind -T copy-mode-vi y send -X copy-pipe-and-cancel "pbcopy"
-bind -T copy-mode-vi MouseDragEnd1Pane send -X copy-pipe-and-cancel "pbcopy"
-{{- else }}
-# Linux: pipe to wl-copy if available (local Wayland), otherwise OSC 52 handles it
-bind -T copy-mode-vi y send -X copy-pipe-and-cancel "wl-copy 2>/dev/null || true"
-bind -T copy-mode-vi MouseDragEnd1Pane send -X copy-pipe-and-cancel "wl-copy 2>/dev/null || true"
-{{- end }}
+# Yank to the LAPTOP's clipboard, via ~/.local/bin/osc52-copy.
+# tmux's built-in copy path emits OSC 52 with an EMPTY target field; mosh 1.4.0
+# only relays OSC 52 carrying an explicit "c" target and drops the empty form, so
+# plain `set-clipboard on` yanks never reached the Mac over mosh. osc52-copy
+# writes the "c" form into the pane tty (tmux re-forwards it verbatim) and also
+# syncs this machine's own clipboard when it has one.
+bind -T copy-mode-vi y send -X copy-pipe-and-cancel "$HOME/.local/bin/osc52-copy #{pane_tty}"
+bind -T copy-mode-vi MouseDragEnd1Pane send -X copy-pipe-and-cancel "$HOME/.local/bin/osc52-copy #{pane_tty}"
 
 # =============================================================================
 # Status Bar - Catppuccin Mocha (accent: {{ $accent }})

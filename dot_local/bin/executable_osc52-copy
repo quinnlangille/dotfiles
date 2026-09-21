@@ -1,0 +1,35 @@
+#!/bin/sh
+# osc52-copy [tty] - send stdin to the *laptop's* clipboard via OSC 52.
+#
+# Why this exists: tmux's own copy path emits OSC 52 with an EMPTY target field
+# (ESC ] 52 ; ; <base64> BEL). mosh 1.4.0 only relays OSC 52 that carries an
+# explicit "c" target and silently drops the empty form, so copy-mode yanks over
+# mosh never reached the Mac. Writing the "c" form into the pane's own tty instead
+# means tmux re-forwards it verbatim, mosh relays it, and herdr turns it into a
+# pbcopy on the laptop. Works over plain ssh too.
+#
+# tmux bindings pass the pane tty explicitly (#{pane_tty}) because a copy-pipe job
+# gets TMUX but no TMUX_PANE, so `tmux display -p` would guess the wrong pane.
+set -eu
+
+out=${1:-}
+payload=$(cat)
+b64=$(printf '%s' "$payload" | base64 | tr -d '\r\n')
+
+if [ -z "$out" ]; then
+	if [ -n "${TMUX:-}" ]; then
+		out=$(tmux display -p '#{pane_tty}')
+	else
+		out=/dev/tty
+	fi
+fi
+printf '\033]52;c;%s\a' "$b64" > "$out"
+
+# Best-effort: also sync this machine's own clipboard, when it has one.
+if command -v pbcopy >/dev/null 2>&1; then
+	printf '%s' "$payload" | pbcopy || true
+elif [ -n "${WAYLAND_DISPLAY:-}" ] && command -v wl-copy >/dev/null 2>&1; then
+	printf '%s' "$payload" | wl-copy || true
+elif [ -n "${DISPLAY:-}" ] && command -v xclip >/dev/null 2>&1; then
+	printf '%s' "$payload" | xclip -selection clipboard || true
+fi
